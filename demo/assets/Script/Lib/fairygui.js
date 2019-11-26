@@ -812,6 +812,7 @@ window.__extends = (this && this.__extends) || (function () {
             },
             set: function (value) {
                 this._name = value;
+                this.node.name = value;
             },
             enumerable: true,
             configurable: true
@@ -8687,6 +8688,10 @@ window.__extends = (this && this.__extends) || (function () {
                 }
             }
             _this.onWinResize();
+            _this._layer1Obj = _this.createLayerNode("Layer_1");
+            _this._layer2Obj = _this.createLayerNode("Layer_2");
+            _this._layer3Obj = _this.createLayerNode("Layer_3");
+            _this._layer4Obj = _this.createLayerNode("Layer_4");
             return _this;
         }
         Object.defineProperty(GRoot, "inst", {
@@ -8702,6 +8707,60 @@ window.__extends = (this && this.__extends) || (function () {
             GRoot._inst = new GRoot();
             GRoot._inst.node.parent = cc.director.getScene();
             return GRoot._inst;
+        };
+        GRoot.prototype.createLayerNode = function (name) {
+            var layerObj = new fgui.GComponent();
+            layerObj.name = name;
+            this.addChild1(layerObj);
+            return layerObj;
+        };
+        GRoot.prototype.addChild1 = function (child) {
+            return _super.prototype.addChild.call(this, child);
+        };
+        GRoot.prototype.addChild = function (child) {
+            console.error("please use AddToUI");
+            return null;
+        };
+        GRoot.prototype.AddToUI = function (child, layer) {
+            if (child == null || layer < 1 || layer > 4) {
+                console.error("AddToUI error");
+                return null;
+            }
+            var gobj;
+            switch (layer) {
+                case GRoot.LAYER_1:
+                    gobj = this._layer1Obj.addChild(child);
+                    break;
+                case GRoot.LAYER_2:
+                    gobj = this._layer2Obj.addChild(child);
+                    break;
+                case GRoot.LAYER_3:
+                    gobj = this._layer3Obj.addChild(child);
+                    break;
+                case GRoot.LAYER_4:
+                    gobj = this._layer4Obj.addChild(child);
+                    break;
+            }
+            return gobj;
+        };
+        GRoot.prototype.DeleteUI = function (child, layer, dispose) {
+            if (dispose === void 0) { dispose = false; }
+            var gobj;
+            switch (layer) {
+                case GRoot.LAYER_1:
+                    gobj = this._layer1Obj.removeChild(child);
+                    break;
+                case GRoot.LAYER_2:
+                    gobj = this._layer1Obj.removeChild(child);
+                    break;
+                case GRoot.LAYER_3:
+                    gobj = this._layer1Obj.removeChild(child);
+                    break;
+                case GRoot.LAYER_4:
+                    gobj = this._layer4Obj.removeChild(child);
+                    break;
+            }
+            return gobj;
         };
         GRoot.prototype.onDestroy = function () {
             if (CC_EDITOR) {
@@ -9046,6 +9105,10 @@ window.__extends = (this && this.__extends) || (function () {
                 GRoot.contentScaleLevel = 0;
         };
         GRoot.contentScaleLevel = 0;
+        GRoot.LAYER_1 = 1;
+        GRoot.LAYER_2 = 2;
+        GRoot.LAYER_3 = 3;
+        GRoot.LAYER_4 = 4;
         return GRoot;
     }(fgui.GComponent));
     fgui.GRoot = GRoot;
