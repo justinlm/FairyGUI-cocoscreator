@@ -94,6 +94,7 @@ namespace fgui {
 
         public set name(value: string) {
             this._name = value;
+            this.node.name = value;
         }
 
         public get x(): number {

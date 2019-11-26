@@ -7,12 +7,22 @@ namespace fgui {
         private _modalLayer: GGraph;
         private _popupStack: Array<GObject>;
         private _justClosedPopups: Array<GObject>;
-        private _modalWaitPane: GObject;
-        private _tooltipWin: GObject;
-        private _defaultTooltipWin: GObject;
+        private _modalWaitPane: GComponent;
+        private _tooltipWin: GComponent;
+        private _defaultTooltipWin: GComponent;
         private _volumeScale: number;
         private _inputProcessor: InputProcessor;
         private _thisOnResized: Function;
+
+        private _layer1Obj:GComponent;
+        private _layer2Obj:GComponent;
+        private _layer3Obj:GComponent;
+        private _layer4Obj:GComponent;
+
+        public static LAYER_1:number = 1;
+        public static LAYER_2:number = 2;
+        public static LAYER_3:number = 3;
+        public static LAYER_4:number = 4;
 
         private static _inst: GRoot;
 
@@ -62,6 +72,69 @@ namespace fgui {
             }
 
             this.onWinResize();
+
+            this._layer1Obj = this.createLayerNode("Layer_1");
+            this._layer2Obj = this.createLayerNode("Layer_2");
+            this._layer3Obj = this.createLayerNode("Layer_3");
+            this._layer4Obj = this.createLayerNode("Layer_4");
+        }
+
+        private createLayerNode(name:string):GComponent {
+            let layerObj:GComponent = new GComponent();
+            layerObj.name = name;
+            this.addChild1(layerObj);
+            return layerObj;
+        }
+
+        private addChild1(child:GComponent):GObject{
+            return super.addChild(child);
+        }
+
+        public addChild(child:GComponent):GObject{
+            console.error("please use AddToUI");
+            return null;
+        }
+
+        public AddToUI(child:GObject, layer:number):GObject{
+            if(child == null || layer < 1 || layer > 4){
+                console.error("AddToUI error");
+                return null;
+            }
+            let gobj:GObject;
+            switch (layer) {
+                case GRoot.LAYER_1:
+                    gobj = this._layer1Obj.addChild(child);
+                    break;
+                case GRoot.LAYER_2:
+                    gobj = this._layer2Obj.addChild(child);
+                    break;
+                case GRoot.LAYER_3:
+                    gobj = this._layer3Obj.addChild(child);
+                    break;
+                case GRoot.LAYER_4:
+                    gobj = this._layer4Obj.addChild(child);
+                    break;
+            }
+            return gobj;
+        }
+
+        public DeleteUI(child:GObject, layer:number, dispose:boolean = false):GObject{
+            let gobj:GObject;
+            switch(layer){
+                case GRoot.LAYER_1:
+                gobj = this._layer1Obj.removeChild(child);
+                break;
+                case GRoot.LAYER_2:
+                gobj = this._layer1Obj.removeChild(child);
+                break;
+                case GRoot.LAYER_3:
+                gobj = this._layer1Obj.removeChild(child);
+                break;
+                case GRoot.LAYER_4:
+                gobj = this._layer4Obj.removeChild(child);
+                break;
+            }
+            return gobj;
         }
 
         protected onDestroy(): void {
@@ -144,7 +217,7 @@ namespace fgui {
         public showModalWait(msg?: string): void {
             if (UIConfig.globalModalWaiting != null) {
                 if (this._modalWaitPane == null)
-                    this._modalWaitPane = UIPackage.createObjectFromURL(UIConfig.globalModalWaiting);
+                    this._modalWaitPane = UIPackage.createObjectFromURL(UIConfig.globalModalWaiting) as GComponent;
                 this._modalWaitPane.setSize(this.width, this.height);
                 this._modalWaitPane.addRelation(this, RelationType.Size);
 
@@ -231,7 +304,7 @@ namespace fgui {
             return pos;
         }
 
-        public showPopup(popup: GObject, target?: GObject, downward?: any): void {
+        public showPopup(popup: GComponent, target?: GObject, downward?: any): void {
             if (this._popupStack.length > 0) {
                 var k: number = this._popupStack.indexOf(popup);
                 if (k != -1) {
@@ -261,7 +334,7 @@ namespace fgui {
             popup.setPosition(pt.x, pt.y);
         }
 
-        public togglePopup(popup: GObject, target?: GObject, downward?: any): void {
+        public togglePopup(popup: GComponent, target?: GObject, downward?: any): void {
             if (this._justClosedPopups.indexOf(popup) != -1)
                 return;
 
@@ -305,14 +378,14 @@ namespace fgui {
                     return;
                 }
 
-                this._defaultTooltipWin = UIPackage.createObjectFromURL(resourceURL);
+                this._defaultTooltipWin = UIPackage.createObjectFromURL(resourceURL) as GComponent;
             }
 
             this._defaultTooltipWin.text = msg;
             this.showTooltipsWin(this._defaultTooltipWin);
         }
 
-        public showTooltipsWin(tooltipWin: GObject): void {
+        public showTooltipsWin(tooltipWin: GComponent): void {
             this.hideTooltips();
 
             this._tooltipWin = tooltipWin;
